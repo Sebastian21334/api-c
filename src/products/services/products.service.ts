@@ -1,9 +1,6 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  CreateProductInput,
-  Product,
-  UpdateProductInput,
-} from '../product.types';
+import {CreateProductInput,UpdateProductInput,} from '../product.types';
+import { Product } from '../entities/product.entity';
 import {PRODUCTS_REPOSITORY,ProductsRepository,} from '../repositories/products.repository';
 import { CategorieRepository, CATEGORIES_REPOSITORY } from 'src/Categories/repositories/categories.repository';
 
@@ -43,18 +40,18 @@ export class ProductsService {
       const productoExistente = encontrados[0];
       const nuevoStock = productoExistente.stock + input.stock;
       const actualizado = await this.productsRepository.update(productoExistente.id, {
-        ...productoExistente,
         stock: nuevoStock,
         price: input.price,
-      });
+      },
+    );
       if (!actualizado) {
         throw new NotFoundException('No se pudo actualizar el producto existente');
       }
       return actualizado;
     }
-
     return this.productsRepository.create(input);
   }
+
 
   async update(id: number, input: UpdateProductInput): Promise<Product> {
     const product = await this.productsRepository.update(id, input);

@@ -1,9 +1,11 @@
+import { Categorie } from 'src/Categories/entities/categorie.entity';
+
 export type Product = {
   id: number;
   name: string;
   price: number;
   stock: number;
-  categorie: number;
+  categorie: Categorie;
 };
 
 export type CreateProductInput = {
