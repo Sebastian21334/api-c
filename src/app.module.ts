@@ -11,6 +11,11 @@ import { CategoriesModule } from './Categories/categorie.module';
 import { Product } from './products/entities/product.entity';
 import { Categorie } from './Categories/entities/categorie.entity';
 
+
+import { MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { TimingMiddleware } from './common/middlewares/timing.middleware';
+
 @Module({
   imports: [
     ProductsModule,
@@ -29,5 +34,12 @@ import { Categorie } from './Categories/entities/categorie.entity';
   ],
   controllers: [AppController],
   providers: [AppService],
+  
 })
-export class AppModule {}
+
+ // Confifuracion de middlewares
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware, TimingMiddleware).forRoutes('*');
+  }
+}
