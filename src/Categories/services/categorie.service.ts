@@ -7,6 +7,7 @@ import {
 import { CategorieRepository, CATEGORIES_REPOSITORY } from '../repositories/categories.repository';
 import { Product } from 'src/products/product.types';
 import { ProductsService } from 'src/products/services/products.service';
+import { PaginatedResult } from 'src/common/types/paginated-result.type';
 
 
 @Injectable()
@@ -37,9 +38,23 @@ export class CategoriesService {
     return categorie;
   }
 
-  async findAll(): Promise<Categorie[]> {
-    return this.categoriesRepository.findAll();
-  }
+  async findAll(page: number, limit: number,): Promise<PaginatedResult<Categorie>> {
+    const skip = (page - 1) * limit;
+    const [categories, total] =
+      await this.categoriesRepository.findAllPaginated(
+        skip,
+        limit,
+      );
+    return {
+      data: categories,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        },
+    };
+  } 
 
   async findByCategory(id: number): Promise<Product[]> {
     const categorie = await this.categoriesRepository.findById(id);

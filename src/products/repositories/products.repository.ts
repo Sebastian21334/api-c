@@ -2,7 +2,7 @@ import {
   CreateProductInput,
   UpdateProductInput,
 } from '../product.types';
-
+import { PaginatedResult } from 'src/common/types/paginated-result.type';
 import { Product } from '../entities/product.entity';
 
 export const PRODUCTS_REPOSITORY = 'PRODUCTS_REPOSITORY';
@@ -17,4 +17,5 @@ export interface ProductsRepository {
   updateStock(id: number, newStock: number, ): Promise<Product>;
   findAllOrdered( orderBy?: 'name' | 'price', order?: 'asc' | 'desc', ): Promise<Product[]>;
   findByCategory(categorie: number, ): Promise<Product[]>;
+  findAllPaginated(skip: number, limit: number,): Promise<[Product[], number]> ;
 }

@@ -13,6 +13,7 @@ import { ProductsService } from '../services/products.service';
 import { Product,} from '../product.types';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
+import { PaginatedResult } from 'src/common/types/paginated-result.type';
 
 
 @Controller('products')
@@ -24,10 +25,21 @@ export class ProductsController {
     @Query('name') name?: string,
     @Query('orderBy') orderBy?: 'name' | 'price',
     @Query('order') order: 'asc' | 'desc' = 'asc',
-  ): Promise<Product[]> {
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Product[] | PaginatedResult<Product>> {
+
+    page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;
+    if (limit > 50) limit = 50;
+    if (limit < 1) limit = 10;
+
     if (name) return this.productsService.findByName(name);
     if (orderBy) return this.productsService.findAllOrdered(orderBy, order);
-    return this.productsService.findAll();
+    
+    return this.productsService.findAll(page, limit);
   }
 
   @Get(':id')

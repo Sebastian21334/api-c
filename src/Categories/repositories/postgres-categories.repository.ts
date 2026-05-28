@@ -35,4 +35,14 @@ export class PostgresCategoriesRepository implements CategorieRepository {
     await this.repository.delete(id);
     return categorie;
   }
+
+  async findAllPaginated(
+    skip: number,
+    limit: number,
+  ): Promise<[Categorie[], number]> {
+    return this.repository.findAndCount({
+      skip,
+      take: limit,
+    });
+  }
 }

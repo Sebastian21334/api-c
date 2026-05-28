@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import {ProductsRepository,} from './products.repository';
-import {CreateProductInput,UpdateProductInput,} from '../product.types';
+import { CreateProductDto } from '../dto/create-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
+import { PaginatedResult } from 'src/common/types/paginated-result.type';
 
 @Injectable()
 export class PostgresProductsRepository
@@ -25,12 +27,12 @@ export class PostgresProductsRepository
     return product ?? undefined;
   }
 
-  async create(input: CreateProductInput): Promise<Product> {
+  async create(input: CreateProductDto): Promise<Product> {
     const product = this.repository.create({...input, categorie: { id: input.categorie }, });
     return await this.repository.save(product);
   }
 
-  async update(id: number, input: UpdateProductInput,): Promise<Product | undefined> {
+  async update(id: number, input: CreateProductDto,): Promise<Product | undefined> {
     const product = await this.findById(id);
     if (!product) return undefined;
     Object.assign(product, {...input, ...(input.categorie !== undefined && {categorie: { id: input.categorie },}),});
@@ -70,6 +72,14 @@ export class PostgresProductsRepository
     return await this.repository.find({
       where: { categorie: { id: categorie } },
       relations: { categorie: true },
+    });
+  }
+
+  async findAllPaginated(skip: number, limit: number,): Promise<[Product[], number]> {
+    return this.repository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['categorie'],
     });
   }
   

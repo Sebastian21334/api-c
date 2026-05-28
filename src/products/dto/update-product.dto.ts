@@ -1,21 +1,22 @@
-import { IsString, IsNumber, IsPositive, Min, IsOptional } from 'class-validator';
+import {IsString,IsPositive,IsInt,Min,IsOptional,MinLength,MaxLength,} from 'class-validator';
 
 export class UpdateProductDto {
   @IsOptional()
   @IsString()
+  @MinLength(2)
+  @MaxLength(100)
   name?: string;
 
   @IsOptional()
-  @IsNumber()
   @IsPositive()
   price?: number;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   @Min(0)
   stock?: number;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   categorie?: number;
 }

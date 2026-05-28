@@ -1,8 +1,10 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {CreateProductInput,UpdateProductInput,} from '../product.types';
 import { Product } from '../entities/product.entity';
 import {PRODUCTS_REPOSITORY,ProductsRepository,} from '../repositories/products.repository';
 import { CategorieRepository, CATEGORIES_REPOSITORY } from 'src/Categories/repositories/categories.repository';
+import { PaginatedResult } from 'src/common/types/paginated-result.type';
+import { CreateProductDto } from '../dto/create-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -18,8 +20,16 @@ export class ProductsService {
     return this.productsRepository.findByName(name);
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productsRepository.findAll();
+  async findAll(page: number, limit: number,): Promise<PaginatedResult<Product>> {
+    const skip = (page - 1) * limit;
+    const [products, total] = await this.productsRepository.findAllPaginated(skip,limit,);
+    return { data: products, meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: number): Promise<Product> {
@@ -28,14 +38,12 @@ export class ProductsService {
     return product;
   }
 
-  async create(input: CreateProductInput): Promise<Product> {
+  async create(input: CreateProductDto): Promise<Product> {
     const encontrados = await this.productsRepository.findByName(input.name);
     const categorie = await this.categoriesRepository.findById(input.categorie);
-
     if (!categorie) {
       throw new NotFoundException(`La categoría con id ${input.categorie} no existe`);
     }
-
     if (encontrados.length > 0) {
       const productoExistente = encontrados[0];
       const nuevoStock = productoExistente.stock + input.stock;
@@ -53,7 +61,7 @@ export class ProductsService {
   }
 
 
-  async update(id: number, input: UpdateProductInput): Promise<Product> {
+  async update(id: number, input: UpdateProductDto): Promise<Product> {
     const product = await this.productsRepository.update(id, input);
     if (!product) throw new NotFoundException('Product not found');
     return product;
