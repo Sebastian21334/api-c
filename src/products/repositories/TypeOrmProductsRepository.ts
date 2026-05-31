@@ -5,11 +5,9 @@ import { Product } from '../entities/product.entity';
 import {ProductsRepository,} from './products.repository';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
-import { PaginatedResult } from 'src/common/types/paginated-result.type';
 
 @Injectable()
-export class PostgresProductsRepository
-  implements ProductsRepository{
+export class TypeOrmProductsRepository implements ProductsRepository{
   constructor(
     @InjectRepository(Product)
     private repository: Repository<Product>,
@@ -32,7 +30,7 @@ export class PostgresProductsRepository
     return await this.repository.save(product);
   }
 
-  async update(id: number, input: CreateProductDto,): Promise<Product | undefined> {
+  async update(id: number, input: UpdateProductDto,): Promise<Product | undefined> {
     const product = await this.findById(id);
     if (!product) return undefined;
     Object.assign(product, {...input, ...(input.categorie !== undefined && {categorie: { id: input.categorie },}),});

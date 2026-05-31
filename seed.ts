@@ -36,7 +36,9 @@ async function seed() {
 
   // 1. Traer categorías existentes
   const resGet = await fetch(`${BASE_URL}/categories`);
-  const existentes: { id: number; name: string }[] = await resGet.json();
+  const body = await resGet.json();
+  const existentes = body.data;
+
 
   // Mapa nombre → id
   const mapaCategoria: Record<string, number> = {};

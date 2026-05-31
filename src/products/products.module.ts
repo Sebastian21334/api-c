@@ -4,14 +4,14 @@ import { PRODUCTS_REPOSITORY } from './repositories/products.repository';
 import { ProductsService } from './services/products.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { PostgresProductsRepository } from './repositories/postgres-products.repository';
+import { TypeOrmProductsRepository  } from './repositories/TypeOrmProductsRepository';
 
 @Global()
 @Module({
   controllers: [ProductsController],
   providers: [
     ProductsService,
-    {provide: PRODUCTS_REPOSITORY, useClass: PostgresProductsRepository,}
+    {provide: PRODUCTS_REPOSITORY, useClass: TypeOrmProductsRepository,}
   ],
   exports: [ProductsService, PRODUCTS_REPOSITORY],
   imports: [
