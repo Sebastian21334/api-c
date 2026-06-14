@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
     CreateCategorieInput,
     Categorie,
@@ -28,7 +28,7 @@ export class CategoriesService {
 
   async create(input: CreateCategorieInput): Promise<Categorie> {
     const existing = await this.categoriesRepository.findByName(input.name);
-    if (existing) throw new BadRequestException('La categoría ya existe');
+    if (existing) throw new ConflictException('La categoría ya existe');
     return this.categoriesRepository.create(input);
   }
 
