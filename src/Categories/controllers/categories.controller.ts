@@ -10,13 +10,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { CategoriesService } from '../services/categorie.service';
-import {
-    CreateCategorieInput,
-    Categorie,
-    UpdateCategorieInput,
-} from '../categorie.types';
+import {Categorie,} from '../categorie.types';
 import { Product } from 'src/products/product.types';
 import { PaginatedResult } from 'src/common/types/paginated-result.type';
+import { CreateCategorieDto } from '../dto/create-categorie.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -52,9 +49,9 @@ export class CategoriesController {
   }
 
   @Post()
-  async create(@Body() body: CreateCategorieInput): Promise<Categorie> {
-    return this.categoriesService.create(body);
-  }
+  async create(@Body() body: CreateCategorieDto): Promise<Categorie> {
+  return this.categoriesService.create(body);
+}
 
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<Categorie | undefined> {

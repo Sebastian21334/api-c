@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -21,9 +21,11 @@ import { TimingMiddleware } from './common/middlewares/timing.middleware';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot(
-      (() => {
-        switch (process.env.DB_SOURCE) {
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (cfg: ConfigService) => {
+        switch (cfg.get<string>('DB_SOURCE')) {
           case 'sqlite':
             return {
               type: 'sqlite',
@@ -35,20 +37,20 @@ import { TimingMiddleware } from './common/middlewares/timing.middleware';
           case 'postgres':
             return {
               type: 'postgres',
-              host: 'localhost',
-              port: 5432,
-              username: 'postgres',
-              password: '21334',
-              database: 'trabajo_desarrollo',
+              host: cfg.getOrThrow<string>('DB_HOST'),
+              port: cfg.get<number>('DB_PORT') ?? 5432,
+              username: cfg.getOrThrow<string>('DB_USERNAME'),
+              password: cfg.getOrThrow<string>('DB_PASSWORD'),
+              database: cfg.getOrThrow<string>('DB_NAME'),
               entities: [Product, Categorie, UserEntity],
               synchronize: true,
             };
 
           default:
-            throw new Error(`DB_SOURCE inválido: ${process.env.DB_SOURCE}`);
+            throw new Error(`DB_SOURCE inválido: ${cfg.get('DB_SOURCE')}`);
         }
-      })()
-    ),
+      },
+    }),
     ProductsModule,
     UsersModule,
     CategoriesModule,
