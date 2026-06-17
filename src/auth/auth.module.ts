@@ -9,13 +9,14 @@ import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule],   
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
         secret: cfg.getOrThrow<string>('JWT_SECRET'),
@@ -25,9 +26,11 @@ import { RolesGuard } from './guards/roles.guard';
       }),
     }),
     TypeOrmModule.forFeature([UserEntity]),
+    EmailModule, 
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
   exports: [JwtModule, JwtAuthGuard, RolesGuard],
 })
+
 export class AuthModule {}
