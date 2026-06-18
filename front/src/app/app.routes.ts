@@ -40,4 +40,15 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin-users/admin-users').then((m) => m.AdminUsersPage),
     canActivate: [authGuard, adminGuard],
   },
+
+  {
+    path: 'verify-pending',
+    loadComponent: () => import('./pages/verify-pending/verify-pending').then((m) => m.VerifyPendingPage),
+  },
+  {
+    path: 'verify-email',
+    loadComponent: () => import('./pages/verify-email/verify-email').then((m) => m.VerifyEmailPage),
+  },
+
+  
 ];

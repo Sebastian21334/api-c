@@ -63,4 +63,13 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, res.access_token);
     this.user.set(res.user);
   }
+
+  verifyEmail(token: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/verify-email`, { token });
+  }
+  
+  resendVerification(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/resend-verification`, {});
+  }
+
 }

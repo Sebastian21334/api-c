@@ -1,0 +1,21 @@
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4 text-center">
+          @if (loading()) {
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Verificando tu email...</p>
+          } @else if (success()) {
+            <i class="bi bi-check-circle display-4 text-success"></i>
+            <h4 class="mt-2">Email verificado correctamente</h4>
+            <a routerLink="/login" class="btn btn-primary mt-3">Ir a iniciar sesión</a>
+          } @else {
+            <i class="bi bi-x-circle display-4 text-danger"></i>
+            <h4 class="mt-2">{{ error() }}</h4>
+            <p class="text-muted small">Para reenviar el email, primero iniciá sesión.</p>
+            <a routerLink="/login" class="btn btn-primary mt-3">Ir a iniciar sesión</a>
+          }
+        </div>
+      </div>
+    </div>
+  </div>

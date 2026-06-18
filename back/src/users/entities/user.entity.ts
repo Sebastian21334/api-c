@@ -22,6 +22,6 @@ export class UserEntity {
 
   @Column({ nullable: true, type: 'varchar' })
   verificationToken!: string | null;
-  createdAt: any;
+  createdAt: Date;
 
 }
