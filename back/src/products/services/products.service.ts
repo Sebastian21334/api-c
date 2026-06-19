@@ -20,15 +20,29 @@ export class ProductsService {
     return this.productsRepository.findByName(name);
   }
 
-  async findAll(page: number, limit: number,): Promise<PaginatedResult<Product>> {
+  async findAll(params: {
+    page: number;
+    limit: number;
+    name?: string;
+    sortBy?: 'id' | 'name' | 'price' | 'stock';
+    order?: 'ASC' | 'DESC';
+  }): Promise<PaginatedResult<Product>> {
+    const { page, limit, name, sortBy, order } = params;
     const skip = (page - 1) * limit;
-    const [products, total] = await this.productsRepository.findAllPaginated(skip,limit,);
-    return { data: products, meta: {
+
+    const [products, total] = await this.productsRepository.findAllFiltered({
+      name,
+      sortBy,
+      order,
+      skip,
+      limit,
+    });
+
+    return {
+      items: products, 
+      total,
       page,
       limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-      },
     };
   }
 

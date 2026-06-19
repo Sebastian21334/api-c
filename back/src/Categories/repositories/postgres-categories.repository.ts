@@ -13,7 +13,9 @@ export class PostgresCategoriesRepository implements CategorieRepository {
   ) {}
 
   async findAll(): Promise<Categorie[]> {
-    return this.repository.find();
+    return this.repository.find({
+      order: { name: 'ASC' },
+    });
   }
 
   async findById(id: number): Promise<Categorie | undefined> {

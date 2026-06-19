@@ -38,23 +38,9 @@ export class CategoriesService {
     return categorie;
   }
 
-  async findAll(page: number, limit: number,): Promise<PaginatedResult<Categorie>> {
-    const skip = (page - 1) * limit;
-    const [categories, total] =
-      await this.categoriesRepository.findAllPaginated(
-        skip,
-        limit,
-      );
-    return {
-      data: categories,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        },
-    };
-  } 
+  async findAll(): Promise<Categorie[]> {
+    return this.categoriesRepository.findAll();
+  }
 
   async findByCategory(id: number): Promise<Product[]> {
     const categorie = await this.categoriesRepository.findById(id);

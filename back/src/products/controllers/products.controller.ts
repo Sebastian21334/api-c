@@ -23,23 +23,19 @@ export class ProductsController {
   @Get()
   async findAll(
     @Query('name') name?: string,
-    @Query('orderBy') orderBy?: 'name' | 'price',
-    @Query('order') order: 'asc' | 'desc' = 'asc',
+    @Query('sortBy') sortBy?: 'id' | 'name' | 'price' | 'stock',
+    @Query('order') order: 'ASC' | 'DESC' = 'ASC',
     @Query('page') page = 1,
     @Query('limit') limit = 10,
-  ): Promise<Product[] | PaginatedResult<Product>> {
-
+  ): Promise<PaginatedResult<Product>> {
     page = Number(page);
     limit = Number(limit);
 
     if (page < 1) page = 1;
-    if (limit > 50) limit = 50;
+    if (limit > 100) limit = 100;
     if (limit < 1) limit = 10;
 
-    if (name) return this.productsService.findByName(name);
-    if (orderBy) return this.productsService.findAllOrdered(orderBy, order);
-    
-    return this.productsService.findAll(page, limit);
+    return this.productsService.findAll({ page, limit, name, sortBy, order });
   }
 
   @Get(':id')

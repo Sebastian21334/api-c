@@ -4,6 +4,16 @@ import { Product } from '../entities/product.entity';
 
 export const PRODUCTS_REPOSITORY = 'PRODUCTS_REPOSITORY';
 
+
+export interface FindAllFilteredParams {
+  name?: string;
+  sortBy?: 'id' | 'name' | 'price' | 'stock';
+  order?: 'ASC' | 'DESC';
+  skip: number;
+  limit: number;
+}
+
+
 export interface ProductsRepository {
   findAll(): Promise<Product[]>;
   findById(id: number, ): Promise<Product | undefined>;
@@ -15,4 +25,5 @@ export interface ProductsRepository {
   findAllOrdered( orderBy?: 'name' | 'price', order?: 'asc' | 'desc', ): Promise<Product[]>;
   findByCategory(categorie: number, ): Promise<Product[]>;
   findAllPaginated(skip: number, limit: number,): Promise<[Product[], number]> ;
+  findAllFiltered(params: FindAllFilteredParams): Promise<[Product[], number]>;
 }

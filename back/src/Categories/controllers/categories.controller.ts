@@ -20,22 +20,8 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
-  async findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ): Promise<PaginatedResult<Categorie>> {
-
-    page = Number(page);
-    limit = Number(limit);
-
-    if (page < 1) page = 1;
-    if (limit > 50) limit = 50;
-    if (limit < 1) limit = 10;
-
-    return this.categoriesService.findAll(
-      page,
-      limit,
-    );
+  async findAll(): Promise<Categorie[]> {
+    return this.categoriesService.findAll();
   }
 
   @Get(':id/products')
