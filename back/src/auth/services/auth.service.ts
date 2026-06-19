@@ -37,8 +37,19 @@ export class AuthService {
       throw new ConflictException('Email ya registrado');
     }
      await this.emailService.sendVerificationEmail(entity.email, entity.verificationToken);
-
-    return { id: entity.id, email: entity.email, role: entity.role };
+    const access_token = this.jwtService.sign({
+      sub: entity.id,
+      role: entity.role,
+    });
+    return {
+      user: {
+        id: entity.id,
+        email: entity.email,
+        role: entity.role,
+        isVerified: entity.isVerified,
+      },
+      access_token,
+    };
   }
 
   async login(email: string, password: string) {
