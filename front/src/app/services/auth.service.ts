@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { AuthResponse, LoginDto, RegisterDto } from '../models/auth';
 import { SafeUser } from '../models/user';
 import { Router } from '@angular/router';
@@ -29,11 +29,12 @@ export class AuthService {
     );
   }
 
-  login(dto: LoginDto): Observable<AuthResponse> {
+  login(dto: LoginDto): Observable<SafeUser> {
     return this.http.post<AuthResponse>(`${this.api}/login`, dto).pipe(
-      tap((res) => this.handleAuth(res)),
-    );
-  }
+    tap((res) => localStorage.setItem(this.tokenKey, res.access_token)),
+    switchMap(() => this.me()),
+  );
+}
 
   me(): Observable<SafeUser> {
     return this.http.get<SafeUser>(`${this.api}/me`).pipe(

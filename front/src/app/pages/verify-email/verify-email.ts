@@ -31,6 +31,11 @@ export class VerifyEmailPage {
     try {
       await firstValueFrom(this.auth.verifyEmail(token));
       this.success.set(true);
+
+      // refrescar el usuario en el estado, solo si ya estaba logueado
+      if (this.auth.isAuthenticated()) {
+        await firstValueFrom(this.auth.me());
+      }
     } catch (err: any) {
       this.error.set(err.error?.message || 'Token inválido o expirado');
     } finally {
