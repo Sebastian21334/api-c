@@ -24,4 +24,20 @@ export class EmailService {
       `,
     });
   }
+
+  async sendResetPasswordEmail(to: string, token: string) {
+    const link = `http://localhost:4200/reset-password?token=${token}`;
+
+    await this.resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to,
+      subject: 'Recuperá tu contraseña',
+      html: `
+        <h2>Recuperación de contraseña</h2>
+        <p>Hacé click en el siguiente link para elegir una nueva contraseña (válido por 1 hora):</p>
+        <a href="${link}">${link}</a>
+        <p>Si vos no pediste esto, podés ignorar este email.</p>
+      `,
+    });
+  }
 }
