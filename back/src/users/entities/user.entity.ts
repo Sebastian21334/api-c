@@ -1,8 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { UserRole } from '../user-role.enum';
 
-
-
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -22,6 +20,12 @@ export class UserEntity {
 
   @Column({ nullable: true, type: 'varchar' })
   verificationToken!: string | null;
-  createdAt: Date;
 
+  @Column({ nullable: true, type: 'varchar' })
+  resetPasswordToken!: string | null;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  resetPasswordExpires!: Date | null;
+
+  createdAt!: Date;
 }

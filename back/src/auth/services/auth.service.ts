@@ -93,10 +93,43 @@ export class AuthService {
   }
   user.verificationToken = randomUUID();
   await this.usersRepo.save(user);
-  await this.emailService.sendVerificationEmail(user.email, user.verificationToken); // ✅ cambio acá
+  await this.emailService.sendVerificationEmail(user.email, user.verificationToken);
   return { message: 'Email reenviado' };
 }
 
+  async forgotPassword(email: string) {
+    const user = await this.usersRepo.findOne({
+      where: { email: email.trim().toLowerCase() },
+    });
+
+    // Si el user no existe, no decimos nada distinto (seguridad: no revelar si el email está registrado)
+    if (user) {
+      user.resetPasswordToken = randomUUID();
+      user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+      await this.usersRepo.save(user);
+      await this.emailService.sendResetPasswordEmail(user.email, user.resetPasswordToken);
+    }
+
+    return { message: 'Si el email existe, recibirás un link' };
+  }
+
+  async resetPassword(token: string, password: string) {
+    const user = await this.usersRepo.findOne({
+      where: { resetPasswordToken: token },
+    });
+
+    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+      throw new BadRequestException('Token inválido o expirado');
+    }
+
+    const rounds = Number(this.cfg.get<string>('BCRYPT_COST') ?? '12');
+    user.passwordHash = await bcrypt.hash(password, rounds);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await this.usersRepo.save(user);
+
+    return { message: 'Contraseña actualizada' };
+  }
 
   async getMe(userId: string) {
     const user = await this.usersRepo.findOne({ where: { id: userId } });
