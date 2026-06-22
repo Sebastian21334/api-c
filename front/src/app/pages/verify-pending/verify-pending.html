@@ -9,13 +9,6 @@
           <button class="btn btn-outline-primary" (click)="resend()" [disabled]="loading()">
             <i class="bi bi-arrow-repeat me-1"></i>Reenviar email
           </button>
-  
-          @if (message()) {
-            <div class="text-success small mt-2">{{ message() }}</div>
-          }
-          @if (error()) {
-            <div class="text-danger small mt-2">{{ error() }}</div>
-          }
         </div>
       </div>
     </div>

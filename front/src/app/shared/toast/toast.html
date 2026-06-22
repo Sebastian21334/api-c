@@ -1,0 +1,20 @@
+<div class="toast-container">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="toast-item alert d-flex align-items-center shadow-sm"
+      [class.alert-success]="toast.type === 'success'"
+      [class.alert-danger]="toast.type === 'error'"
+      [class.alert-info]="toast.type === 'info'"
+    >
+      @if (toast.type === 'success') {
+        <i class="bi bi-check-circle me-2"></i>
+      } @else if (toast.type === 'error') {
+        <i class="bi bi-exclamation-triangle me-2"></i>
+      } @else {
+        <i class="bi bi-info-circle me-2"></i>
+      }
+      <span>{{ toast.message }}</span>
+      <button type="button" class="btn-close ms-auto" (click)="toastService.dismiss(toast.id)"></button>
+    </div>
+  }
+</div>

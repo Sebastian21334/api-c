@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -14,11 +15,11 @@ export class ResetPasswordPage {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   token = '';
   password = '';
   confirmPassword = '';
-  error = '';
   success = signal(false);
   loading = signal(false);
   invalidLink = signal(false);
@@ -27,20 +28,19 @@ export class ResetPasswordPage {
     const token = this.route.snapshot.queryParamMap.get('token');
     if (!token) {
       this.invalidLink.set(true);
+      this.toast.error('Link inválido. Volvé a solicitar la recuperación.');
     } else {
       this.token = token;
     }
   }
 
   async submit(): Promise<void> {
-    this.error = '';
-
     if (this.password !== this.confirmPassword) {
-      this.error = 'Las contraseñas no coinciden';
+      this.toast.error('Las contraseñas no coinciden');
       return;
     }
     if (this.password.length < 8) {
-      this.error = 'La contraseña debe tener al menos 8 caracteres';
+      this.toast.error('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
@@ -48,8 +48,9 @@ export class ResetPasswordPage {
     try {
       await firstValueFrom(this.auth.resetPassword(this.token, this.password));
       this.success.set(true);
+      this.toast.success('Contraseña actualizada correctamente');
     } catch (err: any) {
-      this.error = err.error?.message || 'Token inválido o expirado';
+      this.toast.error(err.error?.message || 'Token inválido o expirado');
     } finally {
       this.loading.set(false);
     }
