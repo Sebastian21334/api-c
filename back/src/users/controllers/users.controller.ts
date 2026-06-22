@@ -1,19 +1,61 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ExternalUser } from '../user.types';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserRole } from '../user-role.enum';
+import { UpdatePasswordDto } from '../dto/update-password.dto';
+import { UpdateEmailDto } from '../dto/update-email.dto';
+import { UpdateRoleDto } from '../dto/update-role.dto';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard) // todos los endpoints de este controller requieren JWT
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // GET /users — solo admin
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  findAll(): Promise<ExternalUser[]> {
+  findAll() {
     return this.usersService.findAll();
   }
-} 
+
+  // PATCH /users/me/password — usuario logueado
+  // IMPORTANTE: esta ruta va ANTES de /users/:id/role para que NestJS
+  // no interprete "me" como un :id
+  @Patch('me/password')
+  updatePassword(@Request() req, @Body() dto: UpdatePasswordDto) {
+    return this.usersService.updatePassword(
+      req.user.id,
+      dto.currentPassword,
+      dto.newPassword,
+    );
+  }
+
+  // PATCH /users/me/email — usuario logueado
+  @Patch('me/email')
+  updateEmail(@Request() req, @Body() dto: UpdateEmailDto) {
+    return this.usersService.updateEmail(
+      req.user.id,
+      dto.newEmail,
+      dto.password,
+    );
+  }
+
+  // PATCH /users/:id/role — solo admin
+  @Patch(':id/role')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateRole(@Request() req, @Param('id') targetId: string, @Body() dto: UpdateRoleDto) {
+    return this.usersService.updateRole(req.user.id, targetId, dto.role);
+  }
+}

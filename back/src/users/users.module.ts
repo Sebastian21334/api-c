@@ -1,24 +1,17 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { UsersController } from './controllers/users.controller';
-import { JsonPlaceholderUsersGateway } from './gateways/jsonplaceholder-users.gateway';
-import { LocalUsersGateway } from './gateways/local-users.gateway';
-import { USERS_GATEWAY } from './gateways/users.gateway';
 import { UsersService } from './services/users.service';
+import { UserEntity } from './entities/user.entity';
 
-@Global()
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService,
-    {
-      provide: USERS_GATEWAY,
-      useFactory: () => {
-        if (process.env.USERS_SOURCE === 'local') {
-          return new LocalUsersGateway();
-        }
-        return new JsonPlaceholderUsersGateway();
-      },
-    },
+  imports: [
+    TypeOrmModule.forFeature([UserEntity]),
+    ConfigModule,
   ],
-  exports: [UsersService, USERS_GATEWAY],
+  controllers: [UsersController],
+  providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
