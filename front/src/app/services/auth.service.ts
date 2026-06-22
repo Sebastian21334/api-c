@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly api = `${environment.apiUrl}/auth`;
+  private readonly usersApi = `${environment.apiUrl}/users`; // base para los endpoints de /users
   private readonly tokenKey = 'access_token';
 
   user = signal<SafeUser | null>(null);
@@ -31,10 +32,10 @@ export class AuthService {
 
   login(dto: LoginDto): Observable<SafeUser> {
     return this.http.post<AuthResponse>(`${this.api}/login`, dto).pipe(
-    tap((res) => localStorage.setItem(this.tokenKey, res.access_token)),
-    switchMap(() => this.me()),
-  );
-}
+      tap((res) => localStorage.setItem(this.tokenKey, res.access_token)),
+      switchMap(() => this.me()),
+    );
+  }
 
   me(): Observable<SafeUser> {
     return this.http.get<SafeUser>(`${this.api}/me`).pipe(
@@ -68,7 +69,7 @@ export class AuthService {
   verifyEmail(token: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/verify-email`, { token });
   }
-  
+
   resendVerification(): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/resend-verification`, {});
   }
@@ -76,11 +77,24 @@ export class AuthService {
   forgotPassword(email: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/forgot-password`, { email });
   }
-  
+
   resetPassword(token: string, password: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/reset-password`, { token, password });
   }
 
-  
+  // --- Punto 1.6 ---
 
+  updatePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(`${this.usersApi}/me/password`, {
+      currentPassword,
+      newPassword,
+    });
+  }
+
+  updateEmail(newEmail: string, password: string): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(`${this.usersApi}/me/email`, {
+      newEmail,
+      password,
+    });
+  }
 }
