@@ -7,8 +7,6 @@
           <h3 class="mt-2 fw-bold">Iniciar sesión</h3>
         </div>
 
-  
-
         <form (ngSubmit)="submit()" #form="ngForm">
           <div class="mb-3">
             <label for="email" class="form-label fw-medium">Email</label>
@@ -41,6 +39,9 @@
                 placeholder="••••••••"
               />
             </div>
+            <div class="text-end mt-1">
+              <a routerLink="/forgot-password" class="small">¿Olvidaste tu contraseña?</a>
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary w-100" [disabled]="form.invalid || loading()">
@@ -55,24 +56,6 @@
           ¿No tenés cuenta? <a routerLink="/register">Registrate</a>
         </p>
       </div>
-    </div>
-  </div>
-  <div class="mb-4">
-    <label for="password" class="form-label fw-medium">Contraseña</label>
-    <div class="input-group">
-      <span class="input-group-text"><i class="bi bi-lock"></i></span>
-      <input
-        id="password"
-        type="password"
-        class="form-control"
-        [(ngModel)]="password"
-        name="password"
-        required
-        placeholder="••••••••"
-      />
-    </div>
-    <div class="text-end mt-1">
-      <a routerLink="/forgot-password" class="small">¿Olvidaste tu contraseña?</a>
     </div>
   </div>
 </div>
