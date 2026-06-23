@@ -21,7 +21,6 @@ import { UpdateRoleDto } from '../dto/update-role.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // GET /users — solo admin
   @Get()
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -29,9 +28,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  // PATCH /users/me/password — usuario logueado
-  // IMPORTANTE: esta ruta va ANTES de /users/:id/role para que NestJS
-  // no interprete "me" como un :id
+
   @Patch('me/password')
   updatePassword(@Request() req, @Body() dto: UpdatePasswordDto) {
     return this.usersService.updatePassword(
@@ -41,7 +38,6 @@ export class UsersController {
     );
   }
 
-  // PATCH /users/me/email — usuario logueado
   @Patch('me/email')
   updateEmail(@Request() req, @Body() dto: UpdateEmailDto) {
     return this.usersService.updateEmail(
@@ -51,7 +47,6 @@ export class UsersController {
     );
   }
 
-  // PATCH /users/:id/role — solo admin
   @Patch(':id/role')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)

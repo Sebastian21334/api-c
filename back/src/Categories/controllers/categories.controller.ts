@@ -4,18 +4,22 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
-  Put,
-  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from '../services/categorie.service';
-import {Categorie,} from '../categorie.types';
+import { Categorie } from '../categorie.types';
 import { Product } from 'src/products/product.types';
-import { PaginatedResult } from 'src/common/types/paginated-result.type';
 import { CreateCategorieDto } from '../dto/create-categorie.dto';
 
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/users/user-role.enum';
+
 @Controller('categories')
+@UseGuards(JwtAuthGuard)
+
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
@@ -35,12 +39,20 @@ export class CategoriesController {
   }
 
   @Post()
-  async create(@Body() body: CreateCategorieDto): Promise<Categorie> {
-  return this.categoriesService.create(body);
-}
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async create(
+    @Body() body: CreateCategorieDto,
+  ): Promise<Categorie> {
+    return this.categoriesService.create(body);
+  }
 
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<Categorie | undefined> {
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async remove(
+    @Param('id') id: number,
+  ): Promise<Categorie | undefined> {
     return this.categoriesService.delete(Number(id));
   }
 }
