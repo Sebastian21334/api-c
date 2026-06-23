@@ -26,7 +26,7 @@ export class TypeOrmProductsRepository implements ProductsRepository{
   }
 
   async create(input: CreateProductDto): Promise<Product> {
-    const product = this.repository.create({...input, category: { id: input.categorie }, });  
+    const product = this.repository.create({...input, category: { id: input.categoryId }, });  
     return await this.repository.save(product);
   }
 

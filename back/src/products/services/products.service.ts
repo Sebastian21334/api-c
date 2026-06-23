@@ -54,9 +54,9 @@ export class ProductsService {
 
   async create(input: CreateProductDto): Promise<Product> {
     const encontrados = await this.productsRepository.findByName(input.name);
-    const categorie = await this.categoriesRepository.findById(input.categorie);
+    const categorie = await this.categoriesRepository.findById(input.categoryId);
     if (!categorie) {
-      throw new NotFoundException(`La categoría con id ${input.categorie} no existe`);
+      throw new NotFoundException(`La categoría con id ${input.categoryId} no existe`);
     }
     if (encontrados.length > 0) {
       const productoExistente = encontrados[0];

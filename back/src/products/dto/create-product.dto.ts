@@ -16,5 +16,5 @@ export class CreateProductDto {
   stock!: number;
 
   @IsInt()
-  categorie!: number;
+  categoryId!: number;
 }
