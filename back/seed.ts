@@ -1,5 +1,8 @@
 const BASE_URL = 'http://localhost:3000';
 
+const ADMIN_EMAIL = 'MAIL_DE_EJEMPLO';
+const ADMIN_PASSWORD = 'CONTRASEÑA_DE_EJEMPLO';
+
 const categorias = [
   { name: 'lacteo' },
   { name: 'frescos' },
@@ -9,86 +12,112 @@ const categorias = [
 ];
 
 const productos = [
-  { name: 'Jamon cocido',      price: 500,  stock: 10, categorie: 'fiambreria' },
-  { name: 'Jamon crudo',       price: 900,  stock: 8,  categorie: 'fiambreria' },
-  { name: 'Queso cremoso',     price: 800,  stock: 24, categorie: 'fiambreria' },
-  { name: 'Queso de barra',    price: 650,  stock: 18, categorie: 'fiambreria' },
-  { name: 'Salame',            price: 1200, stock: 12, categorie: 'fiambreria' },
-  { name: 'Leche entera',      price: 400,  stock: 50, categorie: 'lacteo' },
-  { name: 'Leche descremada',  price: 420,  stock: 30, categorie: 'lacteo' },
-  { name: 'Yogur natural',     price: 350,  stock: 40, categorie: 'lacteo' },
-  { name: 'Crema de leche',    price: 500,  stock: 20, categorie: 'lacteo' },
-  { name: 'Manteca',           price: 600,  stock: 15, categorie: 'lacteo' },
-  { name: 'Arroz largo fino',  price: 1100, stock: 35, categorie: 'despensa' },
-  { name: 'Fideos spaghetti',  price: 800,  stock: 40, categorie: 'despensa' },
-  { name: 'Aceite de girasol', price: 1500, stock: 25, categorie: 'despensa' },
-  { name: 'Azucar',            price: 900,  stock: 30, categorie: 'despensa' },
-  { name: 'Harina 0000',       price: 700,  stock: 45, categorie: 'despensa' },
-  { name: 'Tomate cherry',     price: 600,  stock: 20, categorie: 'frescos' },
-  { name: 'Lechuga',           price: 300,  stock: 25, categorie: 'frescos' },
-  { name: 'Zanahoria',         price: 250,  stock: 30, categorie: 'frescos' },
-  { name: 'Shampoo',           price: 1200, stock: 20, categorie: 'perfumeria' },
-  { name: 'Acondicionador',    price: 1300, stock: 15, categorie: 'perfumeria' },
+  { name: 'Jamon cocido',      price: 500,  stock: 10, categorie: 15 },
+  { name: 'Jamon crudo',       price: 900,  stock: 8,  categorie: 15 },
+  { name: 'Queso cremoso',     price: 800,  stock: 24, categorie: 15 },
+  { name: 'Queso de barra',    price: 650,  stock: 18, categorie: 15 },
+  { name: 'Salame',            price: 1200, stock: 12, categorie: 15 },
+
+  { name: 'Leche entera',      price: 400,  stock: 50, categorie: 12 },
+  { name: 'Leche descremada',  price: 420,  stock: 30, categorie: 12 },
+  { name: 'Yogur natural',     price: 350,  stock: 40, categorie: 12 },
+  { name: 'Crema de leche',    price: 500,  stock: 20, categorie: 12 },
+  { name: 'Manteca',           price: 600,  stock: 15, categorie: 12 },
+
+  { name: 'Arroz largo fino',  price: 1100, stock: 35, categorie: 14 },
+  { name: 'Fideos spaghetti',  price: 800,  stock: 40, categorie: 14 },
+  { name: 'Aceite de girasol', price: 1500, stock: 25, categorie: 14 },
+  { name: 'Azucar',            price: 900,  stock: 30, categorie: 14 },
+  { name: 'Harina 0000',       price: 700,  stock: 45, categorie: 14 },
+
+  { name: 'Tomate cherry',     price: 600,  stock: 20, categorie: 13 },
+  { name: 'Lechuga',           price: 300,  stock: 25, categorie: 13 },
+  { name: 'Zanahoria',         price: 250,  stock: 30, categorie: 13 },
+
+  { name: 'Shampoo',           price: 1200, stock: 20, categorie: 16 },
+  { name: 'Acondicionador',    price: 1300, stock: 15, categorie: 16 },
 ];
 
 async function seed() {
   console.log('🌱 Iniciando carga de datos...\n');
 
-  // 1. Traer categorías existentes
-  const resGet = await fetch(`${BASE_URL}/categories`);
-  const body = await resGet.json();
-  const existentes = body.data;
+  // 1. Login
+  console.log('🔐 Iniciando sesión...');
 
+  const loginRes = await fetch(`${BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: ADMIN_EMAIL,
+      password: ADMIN_PASSWORD,
+    }),
+  });
 
-  // Mapa nombre → id
-  const mapaCategoria: Record<string, number> = {};
+  if (!loginRes.ok) {
+    console.log('❌ Login fallido');
+    console.log(await loginRes.text());
+    process.exit(1);
+  }
+
+  const loginData = await loginRes.json();
+  const token = loginData.access_token;
+
+  console.log('✅ Login exitoso\n');
+
+  const authHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+
+  // 2. Traer categorías (solo para validación opcional)
+  console.log('📂 Cargando categorías...');
+
+  const resCat = await fetch(`${BASE_URL}/categories`, {
+    headers: authHeaders,
+  });
+
+  const existentes = await resCat.json();
+
+  const categoriasIds = {};
   for (const cat of existentes) {
-    mapaCategoria[cat.name] = cat.id;
+    categoriasIds[cat.id] = cat.name;
   }
 
-  // 2. Crear las que no existen
-  console.log('📂 Verificando categorías...');
-  for (const cat of categorias) {
-    if (mapaCategoria[cat.name]) {
-      console.log(`  ✅ ${cat.name} → id ${mapaCategoria[cat.name]} (ya existía)`);
-    } else {
-      const res = await fetch(`${BASE_URL}/categories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cat),
-      });
-      const data = await res.json();
-      mapaCategoria[cat.name] = data.id;
-      console.log(`  ✅ ${cat.name} → id ${data.id} (creada)`);
-    }
-  }
+  console.log('✅ Categorías cargadas\n');
 
   // 3. Cargar productos
-  console.log('\n📦 Cargando productos...');
-  for (const prod of productos) {
-    const categorieId = mapaCategoria[prod.categorie];
+  console.log('📦 Cargando productos...\n');
 
-    if (!categorieId) {
-      console.log(`  ❌ ${prod.name} → categoría "${prod.categorie}" no encontrada`);
+  for (const prod of productos) {
+    // validación opcional
+    if (!categoriasIds[prod.categorie]) {
+      console.log(
+        `❌ ${prod.name} → categoría ${prod.categorie} no existe`
+      );
       continue;
     }
 
     const res = await fetch(`${BASE_URL}/products`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...prod, categorie: categorieId }),
+      headers: authHeaders,
+      body: JSON.stringify({
+        name: prod.name,
+        price: prod.price,
+        stock: prod.stock,
+        categorie: prod.categorie, // 👈 IMPORTANTE (tu DTO lo exige así)
+      }),
     });
 
     if (res.ok) {
       const data = await res.json();
-      console.log(`  ✅ ${prod.name} → id ${data.id}`);
+      console.log(`✅ ${prod.name} → id ${data.id}`);
     } else {
-      const err = await res.json();
-      console.log(`  ❌ ${prod.name} → ${JSON.stringify(err.message)}`);
+      console.log(`❌ Error en ${prod.name}`);
+      console.log(await res.text());
     }
   }
 
-  console.log('\n✅ Carga finalizada!');
+  console.log('\n🎉 Seed finalizado');
 }
 
 seed().catch(console.error);
