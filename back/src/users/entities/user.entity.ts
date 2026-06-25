@@ -27,5 +27,6 @@ export class UserEntity {
   @Column({ nullable: true, type: 'timestamp' })
   resetPasswordExpires!: Date | null;
 
+  @CreateDateColumn()
   createdAt!: Date;
 }

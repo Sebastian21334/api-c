@@ -47,6 +47,7 @@ export class AuthService {
         email: entity.email,
         role: entity.role,
         isVerified: entity.isVerified,
+        createdAt: entity.createdAt,
       },
       access_token,
     };
@@ -65,7 +66,16 @@ export class AuthService {
       sub: user.id,
       role: user.role,
     });
-    return { access_token };
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+      },
+      access_token,
+    };
   }
   
 
