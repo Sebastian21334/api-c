@@ -7,8 +7,6 @@ import {
 import { CategorieRepository, CATEGORIES_REPOSITORY } from '../repositories/categories.repository';
 import { Product } from 'src/products/product.types';
 import { ProductsService } from 'src/products/services/products.service';
-import { PaginatedResult } from 'src/common/types/paginated-result.type';
-
 
 @Injectable()
 export class CategoriesService {
@@ -30,6 +28,16 @@ export class CategoriesService {
     const existing = await this.categoriesRepository.findByName(input.name);
     if (existing) throw new ConflictException('La categoría ya existe');
     return this.categoriesRepository.create(input);
+  }
+
+  async update(id: number, input: UpdateCategorieInput): Promise<Categorie> {
+    const categorie = await this.categoriesRepository.findById(id);
+    if (!categorie) throw new NotFoundException('Categoria no encontrada');
+    if (input.name) {
+      const existing = await this.categoriesRepository.findByName(input.name);
+      if (existing && existing.id !== id) throw new ConflictException('La categoría ya existe');
+    }
+    return this.categoriesRepository.update(id, input);
   }
 
   async delete(id: number): Promise<Categorie> {

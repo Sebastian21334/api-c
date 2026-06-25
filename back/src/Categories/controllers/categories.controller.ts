@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from '../services/categorie.service';
@@ -45,6 +46,16 @@ export class CategoriesController {
     @Body() body: CreateCategorieDto,
   ): Promise<Categorie> {
     return this.categoriesService.create(body);
+  }
+
+  @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async update(
+    @Param('id') id: string,
+    @Body() body: CreateCategorieDto,
+  ): Promise<Categorie> {
+    return this.categoriesService.update(Number(id), body);
   }
 
   @Delete(':id')
