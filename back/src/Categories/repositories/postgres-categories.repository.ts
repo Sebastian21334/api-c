@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Categorie } from '../entities/categorie.entity';
 import { CategorieRepository } from './categories.repository';
-import { CreateCategorieInput } from '../categorie.types';
+import { CreateCategorieInput, UpdateCategorieInput } from '../categorie.types';
 
 @Injectable()
 export class PostgresCategoriesRepository implements CategorieRepository {
@@ -25,6 +25,11 @@ export class PostgresCategoriesRepository implements CategorieRepository {
   async create(input: CreateCategorieInput): Promise<Categorie> {
     const categorie = this.repository.create(input);
     return this.repository.save(categorie);
+  }
+
+  async update(id: number, input: UpdateCategorieInput): Promise<Categorie> {
+    await this.repository.update(id, input);
+    return (await this.repository.findOneBy({ id })) as Categorie;
   }
 
   async findByName(name: string): Promise<Categorie | undefined> {
