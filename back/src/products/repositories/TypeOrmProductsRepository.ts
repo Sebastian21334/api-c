@@ -2,43 +2,48 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
-import {FindAllFilteredParams, ProductsRepository,} from './products.repository';
+import { FindAllFilteredParams, ProductsRepository } from './products.repository';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 
 @Injectable()
-export class TypeOrmProductsRepository implements ProductsRepository{
+export class TypeOrmProductsRepository implements ProductsRepository {
   constructor(
     @InjectRepository(Product)
     private repository: Repository<Product>,
   ) {}
 
   async findAll(): Promise<Product[]> {
-    return await this.repository.find({relations: { category: true }, }); 
+    return await this.repository.find({ relations: { category: true } });
   }
 
   async findById(id: number): Promise<Product | undefined> {
     const product = await this.repository.findOne({
       where: { id },
-      relations: { category: true }, 
+      relations: { category: true },
     });
     return product ?? undefined;
   }
 
   async create(input: CreateProductDto): Promise<Product> {
-    const product = this.repository.create({...input, category: { id: input.categoryId }, });  
+    const product = this.repository.create({ ...input, category: { id: input.categoryId } });
     return await this.repository.save(product);
   }
 
-  async update(id: number, input: UpdateProductDto,): Promise<Product | undefined> {
+  async update(id: number, input: UpdateProductDto): Promise<Product | undefined> {
     const product = await this.findById(id);
     if (!product) return undefined;
-    Object.assign(product, {...input, ...(input.categorie !== undefined && {category: { id: input.categorie },}),}); 
+    Object.assign(product, {
+      ...input,
+      ...(input.categoryId !== undefined && { category: { id: input.categoryId } }),
+    });
+    await this.repository.save(product);
+    return this.findById(id);
   }
 
-  async remove(id: number,): Promise<Product | undefined> { 
+  async remove(id: number): Promise<Product | undefined> {
     const product = await this.findById(id);
-    if (!product) {return undefined;}
+    if (!product) return undefined;
     await this.repository.delete(id);
     return product;
   }
@@ -46,37 +51,35 @@ export class TypeOrmProductsRepository implements ProductsRepository{
   async findByName(name: string): Promise<Product[]> {
     return await this.repository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.category', 'category')  
+      .leftJoinAndSelect('product.category', 'category')
       .where('LOWER(product.name) = LOWER(:name)', { name })
       .getMany();
   }
 
-  async updateStock(id: number,newStock: number,): Promise<Product> {
-    await this.repository.update(id, {stock: newStock,});
+  async updateStock(id: number, newStock: number): Promise<Product> {
+    await this.repository.update(id, { stock: newStock });
     return (await this.findById(id))!;
   }
 
   async findAllOrdered(orderBy: 'name' | 'price' = 'name', order: 'asc' | 'desc' = 'asc'): Promise<Product[]> {
     return await this.repository.find({
-      relations: { category: true },  
-      order: {
-        [orderBy]: order.toUpperCase() as 'ASC' | 'DESC',
-      },
+      relations: { category: true },
+      order: { [orderBy]: order.toUpperCase() as 'ASC' | 'DESC' },
     });
   }
 
   async findByCategory(categorie: number): Promise<Product[]> {
     return await this.repository.find({
-      where: { category: { id: categorie } }, 
-      relations: { category: true }, 
+      where: { category: { id: categorie } },
+      relations: { category: true },
     });
-}
+  }
 
-  async findAllPaginated(skip: number, limit: number,): Promise<[Product[], number]> {
+  async findAllPaginated(skip: number, limit: number): Promise<[Product[], number]> {
     return this.repository.findAndCount({
       skip,
       take: limit,
-      relations: ['categorie'],
+      relations: ['category'],
     });
   }
 
@@ -85,7 +88,7 @@ export class TypeOrmProductsRepository implements ProductsRepository{
 
     const qb = this.repository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.category', 'category') 
+      .leftJoinAndSelect('product.category', 'category')
       .skip(skip)
       .take(limit);
 

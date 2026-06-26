@@ -118,31 +118,31 @@ export class ProductsPage implements OnInit {
   }
 
   async save(): Promise<void> {
-    this.formError = '';
-    try {
-      if (this.editingProduct()) {
-        const dto: UpdateProductDto = {
-          name: this.formName,
-          price: this.formPrice,
-          stock: this.formStock,
-          categoryId: this.formCategoryId,
-        };
-        await firstValueFrom(this.productsService.update(this.editingProduct()!.id, dto));
-      } else {
-        const dto: CreateProductDto = {
-          name: this.formName,
-          price: this.formPrice,
-          stock: this.formStock,
-          categoryId: this.formCategoryId,
-        };
-        await firstValueFrom(this.productsService.create(dto));
-      }
-      this.loadProducts();
-      this.cancelForm();
-    } catch (err: any) {
-      this.formError = err.error?.message || 'Error al guardar';
+  this.formError = '';
+  try {
+    if (this.editingProduct()) {
+      const dto: UpdateProductDto = {
+        name: this.formName,
+        price: Number(this.formPrice),
+        stock: Number(this.formStock),
+        categoryId: this.formCategoryId,
+      };
+      await firstValueFrom(this.productsService.update(this.editingProduct()!.id, dto));
+    } else {
+      const dto: CreateProductDto = {
+        name: this.formName,
+        price: Number(this.formPrice),
+        stock: Number(this.formStock),
+        categoryId: this.formCategoryId,
+      };
+      await firstValueFrom(this.productsService.create(dto));
     }
+    this.loadProducts();
+    this.cancelForm();
+  } catch (err: any) {
+    this.formError = err.error?.message || 'Error al guardar';
   }
+}
 
   async deleteProduct(id: number): Promise<void> {
     if (!confirm('¿Eliminar producto?')) return;
