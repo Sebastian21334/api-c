@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -16,8 +17,12 @@ import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { UpdateEmailDto } from '../dto/update-email.dto';
 import { UpdateRoleDto } from '../dto/update-role.dto';
 
+class DeleteMeDto {
+  password!: string;
+}
+
 @Controller('users')
-@UseGuards(JwtAuthGuard) // todos los endpoints de este controller requieren JWT
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -27,7 +32,6 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
-
 
   @Patch('me/password')
   updatePassword(@Request() req, @Body() dto: UpdatePasswordDto) {
@@ -45,6 +49,11 @@ export class UsersController {
       dto.newEmail,
       dto.password,
     );
+  }
+
+  @Delete('me')
+  deleteMe(@Request() req, @Body() dto: DeleteMeDto) {
+    return this.usersService.deleteMe(req.user.id, dto.password);
   }
 
   @Patch(':id/role')

@@ -49,7 +49,6 @@ export class UsersService {
     return this.usersRepo.save(target);
   }
 
-  // PATCH /users/me/password — usuario logueado
   async updatePassword(userId: string, currentPassword: string, newPassword: string): Promise<{ message: string }> {
     const user = await this.usersRepo
       .createQueryBuilder('u')
@@ -92,5 +91,22 @@ export class UsersService {
     await this.usersRepo.save(user);
 
     return { message: 'Email updated' };
+  }
+
+  async deleteMe(userId: string, password: string): Promise<{ message: string }> {
+    const user = await this.usersRepo
+      .createQueryBuilder('u')
+      .addSelect('u.passwordHash')
+      .where('u.id = :id', { id: userId })
+      .getOne();
+
+    if (!user) throw new UnauthorizedException();
+
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) throw new BadRequestException('Contraseña incorrecta');
+
+    await this.usersRepo.delete(userId);
+
+    return { message: 'Account deleted' };
   }
 }
