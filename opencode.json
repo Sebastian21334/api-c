@@ -7,7 +7,7 @@
         "enabled": true,
         "environment": {
           "API_C_URL": "http://localhost:3000",
-          "API_C_EMAIL": "fleguizamonmarquisio@mail.com",
+          "API_C_EMAIL": "fleguizamonmarquisio@gmail.com",
           "API_C_PASSWORD": "123456789"
         }
       }
