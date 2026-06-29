@@ -16,10 +16,7 @@ import { UserRole } from '../user-role.enum';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { UpdateEmailDto } from '../dto/update-email.dto';
 import { UpdateRoleDto } from '../dto/update-role.dto';
-
-class DeleteMeDto {
-  password!: string;
-}
+import { DeleteMeDto } from '../dto/delete-me.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
