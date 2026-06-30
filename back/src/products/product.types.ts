@@ -5,19 +5,19 @@ export type Product = {
   name: string;
   price: number;
   stock: number;
-  category: Categorie;  
+  category: Categorie | null;
 };
 
 export type CreateProductInput = {
   name: string;
   price: number;
   stock: number;
-  categorie: number; 
+  categorie: number;
 };
 
 export type UpdateProductInput = {
   name?: string;
   price?: number;
   stock?: number;
-  categorie?: number;  
-};
+  categorie?: number;
+};  

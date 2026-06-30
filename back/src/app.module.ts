@@ -44,6 +44,7 @@ import { TimingMiddleware } from './common/middlewares/timing.middleware';
               database: cfg.getOrThrow<string>('DB_NAME'),
               entities: [Product, Categorie, UserEntity],
               synchronize: true,
+              extra: { decimalNumbers: true },
             };
 
           default:

@@ -9,13 +9,13 @@ export class Product {
   @Column()
   name!: string;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2 })
   price!: number;
 
   @Column()
   stock!: number;
 
-  @ManyToOne(() => Categorie, (c) => c.products)
+  @ManyToOne(() => Categorie, (c) => c.products, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'categorie_id' })
-  category!: Categorie;  
+  category!: Categorie | null;
 }
